@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #050d1a;
+  color: #e2e8f0;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a1628;
+}
+::-webkit-scrollbar-thumb {
+  background: #00ff8855;
+  border-radius: 3px;
+}
+
+.glow-green { box-shadow: 0 0 20px rgba(0,255,136,0.25); }
+.glow-red   { box-shadow: 0 0 20px rgba(255,69,96,0.25); }
+.glow-purple{ box-shadow: 0 0 20px rgba(168,85,247,0.25); }
+.glow-blue  { box-shadow: 0 0 20px rgba(0,180,255,0.25); }
+
+.badge-breaking      { @apply bg-red-900/50 text-neon-red border border-red-700 px-2 py-0.5 rounded text-xs font-mono font-semibold; }
+.badge-additive      { @apply bg-green-900/50 text-neon-green border border-green-700 px-2 py-0.5 rounded text-xs font-mono font-semibold; }
+.badge-potentially   { @apply bg-yellow-900/50 text-yellow-400 border border-yellow-700 px-2 py-0.5 rounded text-xs font-mono font-semibold; }
+
+.risk-high   { @apply text-neon-red; }
+.risk-medium { @apply text-yellow-400; }
+.risk-low    { @apply text-neon-green; }
+.risk-none   { @apply text-slate-400; }
+
+.card {
+  @apply bg-navy-800 border border-slate-700/50 rounded-xl p-5;
+}
+
+.code-block {
+  @apply bg-navy-900 border border-slate-700/50 rounded-lg p-4 font-mono text-sm text-neon-green;
+}
