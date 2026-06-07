@@ -1,20 +1,104 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { runScan } from "../api";
 import { RiskBadge, ClassBadge } from "../components/Badges";
 import { Zap, AlertTriangle, CheckCircle, Loader } from "lucide-react";
 
 export default function Scan() {
-  const saved = JSON.parse(localStorage.getItem("db_connection") || "{}");
-  const [form, setForm] = useState({
-    connection_string: saved.connection_string || "",
-    db_alias: saved.db_alias || "",
-    db_type: saved.db_type || "postgresql",
+  const databases = JSON.parse(localStorage.getItem("db_connections") || "[]");
+  
+  const [selectedDbId, setSelectedDbId] = useState(() => {
+    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    if (active.connection_string) {
+      const found = databases.find(
+        (db) => db.connection_string === active.connection_string && db.db_alias === active.db_alias
+      );
+      return found ? found.id : "manual";
+    } else if (databases.length > 0) {
+      return databases[0].id;
+    }
+    return "manual";
   });
+  
+  const [form, setForm] = useState(() => {
+    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    if (active.connection_string) {
+      const found = databases.find(
+        (db) => db.connection_string === active.connection_string && db.db_alias === active.db_alias
+      );
+      if (found) {
+        return {
+          connection_string: found.connection_string,
+          db_alias: found.db_alias,
+          db_type: found.db_type,
+        };
+      } else {
+        return {
+          connection_string: active.connection_string || "",
+          db_alias: active.db_alias || "",
+          db_type: active.db_type || "postgresql",
+        };
+      }
+    } else if (databases.length > 0) {
+      return {
+        connection_string: databases[0].connection_string,
+        db_alias: databases[0].db_alias,
+        db_type: databases[0].db_type,
+      };
+    }
+    return {
+      connection_string: "",
+      db_alias: "",
+      db_type: "postgresql",
+    };
+  });
+  
   const [status, setStatus] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    if (!active.connection_string && list.length > 0) {
+      localStorage.setItem("db_connection", JSON.stringify({
+        connection_string: list[0].connection_string,
+        db_alias: list[0].db_alias,
+        db_type: list[0].db_type,
+        connection_type: list[0].connection_type,
+      }));
+    }
+  }, []);
+
+  const handleDbSelectChange = (e) => {
+    const val = e.target.value;
+    setSelectedDbId(val);
+    setError("");
+
+    if (val === "manual") {
+      setForm({
+        connection_string: "",
+        db_alias: "",
+        db_type: "postgresql",
+      });
+    } else {
+      const db = databases.find((d) => d.id === val);
+      if (db) {
+        setForm({
+          connection_string: db.connection_string,
+          db_alias: db.db_alias,
+          db_type: db.db_type,
+        });
+        localStorage.setItem("db_connection", JSON.stringify({
+          connection_string: db.connection_string,
+          db_alias: db.db_alias,
+          db_type: db.db_type,
+          connection_type: db.connection_type,
+        }));
+      }
+    }
+  };
 
   const handleScan = async () => {
     if (!form.connection_string || !form.db_alias) {
@@ -31,6 +115,8 @@ export default function Scan() {
     }
   };
 
+  const isManual = selectedDbId === "manual";
+
   return (
     <div className="w-full space-y-6">
       <div>
@@ -43,6 +129,27 @@ export default function Scan() {
       </div>
 
       <div className="card space-y-4 max-w-2xl">
+        {/* Connection Selector */}
+        {databases.length > 0 && (
+          <div>
+            <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+              Select Database Connection
+            </label>
+            <select
+              value={selectedDbId}
+              onChange={handleDbSelectChange}
+              className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neon-purple/50 transition cursor-pointer"
+            >
+              {databases.map((db) => (
+                <option key={db.id} value={db.id}>
+                  {db.db_alias} ({db.connection_type === "sqlite" ? "SQLite" : "PostgreSQL"})
+                </option>
+              ))}
+              <option value="manual">Configure connection manually...</option>
+            </select>
+          </div>
+        )}
+
         {/* DB Type toggle */}
         <div>
           <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
@@ -53,11 +160,12 @@ export default function Scan() {
               <button
                 key={t}
                 onClick={() => setForm({ ...form, db_type: t, connection_string: "" })}
+                disabled={!isManual}
                 className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
                   form.db_type === t
                     ? "bg-neon-purple/10 border-neon-purple/40 text-neon-purple"
                     : "border-slate-700 text-slate-400 hover:border-slate-500"
-                }`}
+                } disabled:opacity-60 disabled:cursor-not-allowed`}
               >
                 {t === "postgresql" ? "PostgreSQL" : "SQLite"}
               </button>
@@ -74,7 +182,10 @@ export default function Scan() {
             value={form.db_alias}
             onChange={(e) => setForm({ ...form, db_alias: e.target.value })}
             placeholder="e.g. my_database"
-            className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-purple/50 transition"
+            readOnly={!isManual}
+            className={`w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-purple/50 transition ${
+              !isManual ? "opacity-75 cursor-not-allowed" : ""
+            }`}
           />
         </div>
 
@@ -91,11 +202,25 @@ export default function Scan() {
                 ? "sqlite:///d:/myproject/db.sqlite3"
                 : "postgresql://postgres:password@localhost:5432/mydb"
             }
-            className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-purple/50 transition font-mono"
+            readOnly={!isManual}
+            className={`w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-purple/50 transition font-mono ${
+              !isManual ? "opacity-75 cursor-not-allowed" : ""
+            }`}
           />
-          {form.db_type === "sqlite" && (
+          {form.db_type === "sqlite" && isManual && (
             <p className="text-slate-500 text-xs mt-1.5">
               Format: <span className="text-neon-green font-mono">sqlite:///C:/full/path/to/your.db</span>
+            </p>
+          )}
+          {!isManual && (
+            <p className="text-slate-500 text-xs mt-1.5">
+              Preconfigured connection. To edit details, go to{" "}
+              <span 
+                onClick={() => navigate("/connect")}
+                className="text-neon-purple font-medium cursor-pointer hover:underline"
+              >
+                Databases
+              </span>.
             </p>
           )}
         </div>

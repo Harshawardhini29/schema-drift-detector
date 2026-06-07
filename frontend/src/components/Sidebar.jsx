@@ -6,7 +6,7 @@ import {
 
 const links = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/connect", icon: Database, label: "Connect DB" },
+  { to: "/connect", icon: Database, label: "Databases" },
   { to: "/scan", icon: ScanSearch, label: "Run Scan" },
   { to: "/reports", icon: FileWarning, label: "Drift Reports" },
   { to: "/snapshots", icon: History, label: "Snapshots" },

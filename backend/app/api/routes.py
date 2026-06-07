@@ -69,9 +69,51 @@ def _run_scan_logic(db, db_alias, db_type, connection_string):
     }
 
 
+class TestConnectionRequest(BaseModel):
+    connection_string: str
+
+
+@router.post("/test-connection")
+def test_connection(req: TestConnectionRequest):
+    conn_str = req.connection_string
+    if not conn_str:
+        raise HTTPException(status_code=400, detail="Connection string cannot be empty")
+    
+    if conn_str.startswith("postgres://"):
+        conn_str = conn_str.replace("postgres://", "postgresql://", 1)
+
+    try:
+        from sqlalchemy import create_engine
+        engine = create_engine(conn_str)
+        with engine.connect() as conn:
+            pass
+        engine.dispose()
+        return {"success": True, "message": "Connection successful!"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Connection failed: {str(e)}")
+
+
+class TestConnectionRequest(BaseModel):
+    connection_string: str
+
+
+@router.post("/test-connection")
+def test_db_connection(req: TestConnectionRequest):
+    try:
+        from sqlalchemy import create_engine, text
+        engine = create_engine(req.connection_string)
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        engine.dispose()
+        return {"success": True, "message": "Connection successful!"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Connection failed: {str(e)}")
+
+
 @router.post("/scan")
 def run_scan(req: ScanRequest, db: Session = Depends(get_db)):
     return _run_scan_logic(db, req.db_alias, req.db_type, req.connection_string)
+
 
 
 

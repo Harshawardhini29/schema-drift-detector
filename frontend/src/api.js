@@ -5,6 +5,7 @@ const api = axios.create({
   timeout: 60000,
 });
 
+export const testConnection = (data) => api.post("/test-connection", data);
 export const runScan = (data) => api.post("/scan", data);
 export const runSqliteUploadScan = (formData) =>
   api.post("/scan/sqlite-upload", formData, {
