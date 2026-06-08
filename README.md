@@ -96,7 +96,7 @@ Schema Drift Detector solves a critical DevOps and data engineering problem: **d
 
 > High-Level Design of the full backend system — from client request to AI-powered drift analysis and database persistence.
 
-![Schema Drift Detector — High Level Design](schema-drift-detector/backend/db_hld.drawio.png)
+![Schema Drift Detector — High Level Design](backend/db_hld.drawio.png)
 
 ---
 
