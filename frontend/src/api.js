@@ -5,6 +5,24 @@ const api = axios.create({
   timeout: 60000,
 });
 
+// Add interceptor to include the JWT token in all API requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export const login = (data) => api.post("/auth/login", data);
+export const register = (data) => api.post("/auth/register", data);
+export const getMe = () => api.get("/auth/me");
+
 export const testConnection = (data) => api.post("/test-connection", data);
 export const runScan = (data) => api.post("/scan", data);
 export const runSqliteUploadScan = (formData) =>
@@ -18,3 +36,4 @@ export const getSnapshot = (id) => api.get(`/snapshots/${id}`);
 export const getDriftReports = (db_alias) =>
   api.get("/drift-reports", { params: db_alias ? { db_alias } : {} });
 export const getDriftReport = (id) => api.get(`/drift-reports/${id}`);
+

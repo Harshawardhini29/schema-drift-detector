@@ -118,27 +118,27 @@ export default function Scan() {
   const isManual = selectedDbId === "manual";
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 max-w-[1440px] mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-white">
-          Run <span className="text-neon-purple">Schema Scan</span>
+        <h1 className="text-headline-md lg:text-headline-lg font-bold text-flux-on-surface">
+          Run <span className="text-flux-tertiary-container">Schema Scan</span>
         </h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <p className="text-flux-on-surface-variant text-body-md mt-1">
           Extract current schema, compare with previous snapshot, and trigger AI analysis.
         </p>
       </div>
 
-      <div className="card space-y-4 max-w-2xl">
+      <div className="card bg-white border border-flux-outline-variant/30 space-y-4 max-w-2xl">
         {/* Connection Selector */}
         {databases.length > 0 && (
           <div>
-            <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+            <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
               Select Database Connection
             </label>
             <select
               value={selectedDbId}
               onChange={handleDbSelectChange}
-              className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neon-purple/50 transition cursor-pointer"
+              className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition cursor-pointer font-semibold"
             >
               {databases.map((db) => (
                 <option key={db.id} value={db.id}>
@@ -152,7 +152,7 @@ export default function Scan() {
 
         {/* DB Type toggle */}
         <div>
-          <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+          <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
             DB Type
           </label>
           <div className="flex gap-2">
@@ -161,10 +161,10 @@ export default function Scan() {
                 key={t}
                 onClick={() => setForm({ ...form, db_type: t, connection_string: "" })}
                 disabled={!isManual}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${
                   form.db_type === t
-                    ? "bg-neon-purple/10 border-neon-purple/40 text-neon-purple"
-                    : "border-slate-700 text-slate-400 hover:border-slate-500"
+                    ? "bg-flux-tertiary-container/10 border-flux-tertiary-container/30 text-flux-tertiary-container"
+                    : "border-slate-200 text-flux-on-surface-variant hover:border-slate-400 bg-white"
                 } disabled:opacity-60 disabled:cursor-not-allowed`}
               >
                 {t === "postgresql" ? "PostgreSQL" : "SQLite"}
@@ -175,7 +175,7 @@ export default function Scan() {
 
         {/* Alias */}
         <div>
-          <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+          <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
             Database Alias
           </label>
           <input
@@ -183,15 +183,15 @@ export default function Scan() {
             onChange={(e) => setForm({ ...form, db_alias: e.target.value })}
             placeholder="e.g. my_database"
             readOnly={!isManual}
-            className={`w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-purple/50 transition ${
-              !isManual ? "opacity-75 cursor-not-allowed" : ""
+            className={`w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition ${
+              !isManual ? "opacity-75 bg-flux-surface cursor-not-allowed border-slate-200" : ""
             }`}
           />
         </div>
 
         {/* Connection string */}
         <div>
-          <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+          <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
             Connection String
           </label>
           <input
@@ -203,21 +203,21 @@ export default function Scan() {
                 : "postgresql://postgres:password@localhost:5432/mydb"
             }
             readOnly={!isManual}
-            className={`w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-purple/50 transition font-mono ${
-              !isManual ? "opacity-75 cursor-not-allowed" : ""
+            className={`w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition font-mono ${
+              !isManual ? "opacity-75 bg-flux-surface cursor-not-allowed border-slate-200" : ""
             }`}
           />
           {form.db_type === "sqlite" && isManual && (
-            <p className="text-slate-500 text-xs mt-1.5">
-              Format: <span className="text-neon-green font-mono">sqlite:///C:/full/path/to/your.db</span>
+            <p className="text-flux-on-surface-variant text-xs mt-1.5">
+              Format: <span className="text-flux-secondary font-mono">sqlite:///C:/full/path/to/your.db</span>
             </p>
           )}
           {!isManual && (
-            <p className="text-slate-500 text-xs mt-1.5">
+            <p className="text-flux-on-surface-variant text-xs mt-1.5">
               Preconfigured connection. To edit details, go to{" "}
               <span 
                 onClick={() => navigate("/connect")}
-                className="text-neon-purple font-medium cursor-pointer hover:underline"
+                className="text-flux-primary font-semibold cursor-pointer hover:underline"
               >
                 Databases
               </span>.
@@ -226,7 +226,7 @@ export default function Scan() {
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 bg-red-900/30 border border-red-700/50 rounded-lg px-3 py-2 text-red-400 text-sm">
+          <div className="flex items-center gap-2 bg-flux-error/10 border border-flux-error/30 rounded px-3 py-2 text-flux-error text-sm">
             <AlertTriangle size={14} /> {error}
           </div>
         )}
@@ -234,7 +234,7 @@ export default function Scan() {
         <button
           onClick={handleScan}
           disabled={status === "loading"}
-          className="w-full py-3 bg-neon-purple/10 border border-neon-purple/40 text-neon-purple font-semibold rounded-lg hover:bg-neon-purple/20 transition glow-purple flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-flux-primary text-white font-semibold rounded hover:bg-flux-primary-container transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-float"
         >
           {status === "loading" ? (
             <><Loader size={16} className="animate-spin" /> Scanning & Analyzing...</>
@@ -246,60 +246,60 @@ export default function Scan() {
 
       {/* Result */}
       {status === "done" && result && (
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-4xl">
           {/* Summary card */}
-          <div className={`card border ${result.drift_detected ? "border-neon-red/30 glow-red" : "border-neon-green/30 glow-green"}`}>
+          <div className={`card bg-white border transition duration-200 ${result.drift_detected ? "border-flux-error/30 ring-2 ring-flux-error/5" : "border-flux-secondary/30 ring-2 ring-flux-secondary/5"}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 {result.drift_detected
-                  ? <AlertTriangle size={18} className="text-neon-red" />
-                  : <CheckCircle size={18} className="text-neon-green" />}
-                <span className="font-semibold text-white">
+                  ? <AlertTriangle size={18} className="text-flux-error" />
+                  : <CheckCircle size={18} className="text-flux-secondary" />}
+                <span className="font-bold text-flux-on-surface text-base">
                   {result.drift_detected ? "Drift Detected!" : "No Drift Detected"}
                 </span>
               </div>
               {result.overall_risk && <RiskBadge risk={result.overall_risk} />}
             </div>
-            {result.message && <p className="text-slate-400 text-sm">{result.message}</p>}
+            {result.message && <p className="text-flux-on-surface-variant text-sm">{result.message}</p>}
             {result.total_changes > 0 && (
-              <p className="text-slate-300 text-sm mt-1">
-                <span className="text-neon-purple font-mono">{result.total_changes}</span> change(s) detected
+              <p className="text-flux-on-surface-variant text-sm mt-1">
+                <span className="text-flux-primary font-mono font-bold">{result.total_changes}</span> change(s) detected
               </p>
             )}
           </div>
 
           {/* LLM Summary */}
           {result.llm_analysis?.summary && (
-            <div className="card border border-neon-purple/20">
-              <p className="text-xs text-neon-purple uppercase tracking-wider font-medium mb-2">
+            <div className="card bg-white border border-flux-tertiary-container/30">
+              <p className="text-xs text-flux-tertiary font-semibold uppercase tracking-wider mb-2">
                 🤖 AI Summary
               </p>
-              <p className="text-slate-300 text-sm leading-relaxed">{result.llm_analysis.summary}</p>
+              <p className="text-flux-on-surface text-sm leading-relaxed">{result.llm_analysis.summary}</p>
             </div>
           )}
 
           {/* Change breakdown */}
           {result.llm_analysis?.changes?.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Change Analysis</p>
+            <div className="space-y-4">
+              <p className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold">Change Analysis</p>
               {result.llm_analysis.changes.map((c, i) => (
-                <div key={i} className="bg-navy-800 border border-slate-700/50 rounded-xl overflow-hidden">
-                  <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-slate-700/40 bg-navy-900/50">
-                    <span className="font-mono font-bold text-neon-blue">{c.table}</span>
-                    <span className="text-slate-500 text-xs font-mono bg-slate-800 px-2 py-0.5 rounded">
+                <div key={i} className="bg-white border border-flux-outline-variant/30 rounded-lg overflow-hidden">
+                  <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-flux-outline-variant/30 bg-flux-surface-container-low">
+                    <span className="font-mono font-bold text-flux-secondary">{c.table}</span>
+                    <span className="text-flux-on-surface-variant text-xs font-mono bg-white border border-flux-outline-variant/30 px-2 py-0.5 rounded-sm">
                       {c.type?.replace(/_/g, " ")}
                     </span>
                     <ClassBadge classification={c.classification} />
                     <RiskBadge risk={c.risk} />
                   </div>
-                  <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="bg-red-950/30 border border-red-800/30 rounded-lg p-4">
-                      <p className="text-xs text-red-400 uppercase tracking-wider font-semibold mb-2">⚠ Impact</p>
-                      <p className="text-slate-300 text-sm leading-relaxed">{c.impact}</p>
+                  <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-flux-error/5 border border-flux-error/20 rounded-sm p-4">
+                      <p className="text-xs text-flux-error uppercase tracking-wider font-semibold mb-2">⚠ Impact</p>
+                      <p className="text-flux-on-surface text-sm leading-relaxed">{c.impact}</p>
                     </div>
-                    <div className="bg-green-950/30 border border-green-800/30 rounded-lg p-4">
-                      <p className="text-xs text-neon-green uppercase tracking-wider font-semibold mb-2">✓ Mitigation</p>
-                      <p className="text-slate-300 text-sm leading-relaxed">{c.mitigation}</p>
+                    <div className="bg-flux-secondary/5 border border-flux-secondary/20 rounded-sm p-4">
+                      <p className="text-xs text-flux-secondary uppercase tracking-wider font-semibold mb-2">✓ Mitigation</p>
+                      <p className="text-flux-on-surface text-sm leading-relaxed">{c.mitigation}</p>
                     </div>
                   </div>
                 </div>
@@ -310,7 +310,7 @@ export default function Scan() {
           {result.report_id && (
             <button
               onClick={() => navigate(`/reports/${result.report_id}`)}
-              className="text-sm text-neon-purple hover:underline"
+              className="text-sm text-flux-primary hover:underline font-semibold"
             >
               View full report →
             </button>

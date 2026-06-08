@@ -284,68 +284,68 @@ export default function ConnectDB() {
   const activeId = getActiveDbId();
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-6 max-w-[1440px] mx-auto">
       {view === "list" ? (
         <>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">
-                Database <span className="text-neon-green">Connections</span>
+              <h1 className="text-headline-md lg:text-headline-lg font-bold text-flux-on-surface">
+                Database <span className="text-flux-primary-container">Connections</span>
               </h1>
-              <p className="text-slate-400 text-sm mt-1">
+              <p className="text-flux-on-surface-variant text-body-md mt-1">
                 Manage your connected databases for schema monitoring.
               </p>
             </div>
             <button
               onClick={handleAddClick}
-              className="py-2.5 px-4 bg-neon-green/10 border border-neon-green/40 text-neon-green font-semibold rounded-lg hover:bg-neon-green/20 transition glow-green flex items-center gap-2 text-sm"
+              className="py-2.5 px-4 bg-flux-primary text-white font-semibold rounded hover:bg-flux-primary-container transition shadow-float flex items-center gap-2 text-sm"
             >
               <Plus size={16} /> Add Connection
             </button>
           </div>
 
           {databases.length === 0 ? (
-            <div className="card text-center py-20">
-              <Server size={40} className="text-slate-600 mx-auto mb-3" />
-              <p className="text-slate-400 mb-4">No databases connected yet.</p>
+            <div className="card bg-white border border-flux-outline-variant/30 text-center py-20">
+              <Server size={40} className="text-flux-outline mx-auto mb-3" />
+              <p className="text-flux-on-surface-variant mb-4">No databases connected yet.</p>
               <button
                 onClick={handleAddClick}
-                className="py-2 px-4 bg-neon-green/15 border border-neon-green/50 text-neon-green font-semibold rounded-lg hover:bg-neon-green/25 transition text-sm inline-flex items-center gap-1.5"
+                className="py-2.5 px-4 bg-flux-primary text-white font-semibold rounded hover:bg-flux-primary-container transition shadow-float inline-flex items-center gap-1.5 text-sm"
               >
                 <Plus size={16} /> Connect Your First Database
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {databases.map((db) => {
                 const isActive = db.id === activeId;
                 const cardResult = cardTestResults[db.id];
                 return (
                   <div 
                     key={db.id} 
-                    className={`card border transition duration-200 flex flex-col justify-between p-5 ${
+                    className={`card bg-white border transition duration-200 flex flex-col justify-between p-5 ${
                       isActive 
-                        ? "border-neon-green/40 bg-navy-800/80 glow-green" 
-                        : "border-slate-700/50 hover:border-slate-600 bg-navy-850"
+                        ? "border-flux-primary ring-2 ring-flux-primary/10 shadow-float" 
+                        : "border-flux-outline-variant/40 hover:border-flux-outline"
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-3 gap-2">
-                        <h3 className="text-white font-bold text-lg truncate flex-1">{db.db_alias}</h3>
+                        <h3 className="text-flux-on-surface font-bold text-lg truncate flex-1">{db.db_alias}</h3>
                         {isActive && (
-                          <span className="flex items-center gap-1.5 text-xs text-neon-green font-semibold bg-neon-green/5 border border-neon-green/20 px-2 py-0.5 rounded-full shrink-0">
-                            <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" /> Active
+                          <span className="flex items-center gap-1.5 text-xs text-flux-primary font-semibold bg-flux-primary/5 border border-flux-primary/20 px-2 py-0.5 rounded-full shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-flux-primary animate-pulse" /> Active
                           </span>
                         )}
                       </div>
                       
                       <div className="mb-4">
-                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] uppercase font-mono font-bold tracking-wider mb-2 ${
+                        <span className={`inline-block px-2 py-0.5 rounded-[4px] text-[10px] uppercase font-mono font-bold tracking-wider mb-2 ${
                           db.connection_type === "sqlite" 
-                            ? "bg-neon-purple/10 border border-neon-purple/30 text-neon-purple"
+                            ? "bg-flux-tertiary/10 border border-flux-tertiary/20 text-flux-tertiary"
                             : db.connection_type === "postgresql_hosted"
-                            ? "bg-neon-blue/10 border border-neon-blue/30 text-neon-blue"
-                            : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                            ? "bg-flux-secondary/10 border border-flux-secondary/20 text-flux-secondary"
+                            : "bg-flux-primary/10 border border-flux-primary/20 text-flux-primary"
                         }`}>
                           {db.connection_type === "sqlite" 
                             ? "SQLite"
@@ -355,12 +355,12 @@ export default function ConnectDB() {
                         </span>
                         
                         <div className="relative">
-                          <p className="text-slate-400 text-xs font-mono break-all bg-navy-900/60 p-2.5 pr-10 rounded border border-slate-800/50 min-h-[38px] flex items-center">
+                          <p className="text-flux-on-surface-variant text-xs font-mono break-all bg-flux-surface p-2.5 pr-10 rounded border border-flux-outline-variant/20 min-h-[38px] flex items-center">
                             {visibleUrls[db.id] ? db.connection_string : "••••••••••••••••••••••••••••••••"}
                           </p>
                           <button
                             onClick={() => toggleUrlVisibility(db.id)}
-                            className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300"
+                            className="absolute right-3 top-2.5 text-flux-outline hover:text-flux-on-surface"
                             title={visibleUrls[db.id] ? "Hide Connection String" : "Show Connection String"}
                           >
                             {visibleUrls[db.id] ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -372,21 +372,21 @@ export default function ConnectDB() {
                     <div className="space-y-3 mt-4">
                       {/* Connection Test feedback specifically for this card */}
                       {cardResult && (
-                        <div className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 text-xs ${
+                        <div className={`flex items-center gap-1.5 border rounded px-2.5 py-1.5 text-xs ${
                           cardResult.success 
-                            ? "bg-green-950/20 border-green-800/40 text-neon-green" 
-                            : "bg-red-950/20 border-red-800/40 text-red-400"
+                            ? "bg-flux-secondary/10 border-flux-secondary/20 text-flux-secondary" 
+                            : "bg-flux-error/10 border-flux-error/20 text-flux-error"
                         }`}>
                           {cardResult.success ? <CheckCircle size={12} /> : <AlertTriangle size={12} className="shrink-0" />}
                           <span className="truncate flex-1">{cardResult.message}</span>
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2 border-t border-slate-800 pt-3">
+                      <div className="flex items-center gap-2 border-t border-flux-outline-variant/20 pt-3">
                         <button
                           onClick={() => handleScanClick(db)}
                           title="Scan Schema"
-                          className="p-2 bg-neon-purple/10 border border-neon-purple/40 text-neon-purple hover:bg-neon-purple/20 transition rounded-lg"
+                          className="p-2 bg-flux-tertiary/10 border border-flux-tertiary/20 text-flux-tertiary hover:bg-flux-tertiary/20 transition rounded"
                         >
                           <Play size={14} fill="currentColor" />
                         </button>
@@ -395,7 +395,7 @@ export default function ConnectDB() {
                           onClick={() => handleTestCardConnection(db)}
                           disabled={testingCardId === db.id}
                           title="Test Connection"
-                          className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 transition rounded-lg border border-slate-700 disabled:opacity-50"
+                          className="p-2 bg-flux-surface-container hover:bg-flux-surface-container-high text-flux-on-surface-variant transition rounded border border-flux-outline-variant/30 disabled:opacity-50"
                         >
                           {testingCardId === db.id ? (
                             <Loader size={14} className="animate-spin" />
@@ -407,7 +407,7 @@ export default function ConnectDB() {
                         <button
                           onClick={() => handleEditClick(db)}
                           title="Edit"
-                          className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 transition rounded-lg border border-slate-700"
+                          className="p-2 bg-flux-surface-container hover:bg-flux-surface-container-high text-flux-on-surface-variant transition rounded border border-flux-outline-variant/30"
                         >
                           <Edit3 size={14} />
                         </button>
@@ -415,7 +415,7 @@ export default function ConnectDB() {
                         {!isActive && (
                           <button
                             onClick={() => handleSetActive(db)}
-                            className="text-xs px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 transition rounded-lg border border-slate-700"
+                            className="text-xs px-2.5 py-2 bg-flux-surface-container hover:bg-flux-surface-container-high text-flux-on-surface font-semibold transition rounded border border-flux-outline-variant/30"
                           >
                             Set Active
                           </button>
@@ -424,7 +424,7 @@ export default function ConnectDB() {
                         <button
                           onClick={() => handleDeleteClick(db.id)}
                           title="Delete"
-                          className="p-2 bg-red-950/20 hover:bg-red-900/20 border border-red-900/40 text-red-400 transition rounded-lg ml-auto"
+                          className="p-2 bg-flux-error/10 hover:bg-flux-error/20 border border-flux-error/30 text-flux-error transition rounded ml-auto"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -440,16 +440,16 @@ export default function ConnectDB() {
         <div className="max-w-xl space-y-6">
           <button
             onClick={() => setView("list")}
-            className="flex items-center gap-1 text-sm text-slate-400 hover:text-white transition"
+            className="flex items-center gap-1 text-sm text-flux-on-surface-variant hover:text-flux-on-surface transition font-semibold"
           >
             <ChevronLeft size={16} /> Back to Connections
           </button>
 
           <div>
-            <h1 className="text-2xl font-bold text-white">
-              {editingId ? "Edit" : "Connect"} <span className="text-neon-green">Database</span>
+            <h1 className="text-headline-md font-bold text-flux-on-surface">
+              {editingId ? "Edit" : "Connect"} <span className="text-flux-primary-container">Database</span>
             </h1>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-flux-on-surface-variant text-sm mt-1">
               Configure your database connection details below.
             </p>
           </div>
@@ -467,10 +467,10 @@ export default function ConnectDB() {
                   setConnectionType(t.id);
                   setTestResult(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                className={`px-4 py-2 rounded text-sm font-semibold border transition-all ${
                   connectionType === t.id
-                    ? "bg-neon-green/10 border-neon-green/40 text-neon-green glow-green"
-                    : "border-slate-700 text-slate-400 hover:border-slate-500"
+                    ? "bg-flux-primary-container/10 border-flux-primary-container/30 text-flux-primary-container shadow-sm"
+                    : "border-slate-200 text-flux-on-surface-variant hover:border-slate-400 bg-white"
                 }`}
               >
                 {t.label}
@@ -478,7 +478,7 @@ export default function ConnectDB() {
             ))}
           </div>
 
-          <div className="card space-y-4">
+          <div className="card bg-white border border-flux-outline-variant/30 space-y-4">
             {connectionType === "postgresql" && (
               <>
                 {[
@@ -489,19 +489,19 @@ export default function ConnectDB() {
                   { key: "user", label: "Username", placeholder: "postgres" },
                 ].map(({ key, label, placeholder }) => (
                   <div key={key}>
-                    <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+                    <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                       {label}
                     </label>
                     <input
                       value={form[key]}
                       onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                       placeholder={placeholder}
-                      className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-green/50 transition"
+                      className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition"
                     />
                   </div>
                 ))}
                 <div>
-                  <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+                  <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                     Password
                   </label>
                   <div className="relative">
@@ -510,11 +510,11 @@ export default function ConnectDB() {
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
                       placeholder="••••••••"
-                      className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-green/50 transition pr-10"
+                      className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition pr-10"
                     />
                     <button
                       onClick={() => setShowPass(!showPass)}
-                      className="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300"
+                      className="absolute right-3 top-2.5 text-flux-outline hover:text-flux-on-surface"
                     >
                       {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -526,29 +526,29 @@ export default function ConnectDB() {
             {connectionType === "postgresql_hosted" && (
               <>
                 <div>
-                  <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+                  <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                     Connection Alias
                   </label>
                   <input
                     value={hostedAlias}
                     onChange={(e) => setHostedAlias(e.target.value)}
                     placeholder="e.g. production_db"
-                    className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-green/50 transition"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+                  <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                     Connection String / URI
                   </label>
                   <input
                     value={hostedUri}
                     onChange={(e) => setHostedUri(e.target.value)}
                     placeholder="postgresql://user:password@host:5432/mydb"
-                    className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-green/50 transition font-mono"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition font-mono"
                   />
-                  <p className="text-slate-500 text-xs mt-1.5">
+                  <p className="text-flux-on-surface-variant text-xs mt-1.5">
                     Enter the full hosted database connection URI.
-                    e.g. Render/Supabase → <span className="text-neon-green font-mono">postgresql://user:pass@host:5432/dbname</span>
+                    e.g. Render/Supabase → <span className="text-flux-secondary font-mono">postgresql://user:pass@host:5432/dbname</span>
                   </p>
                 </div>
               </>
@@ -557,29 +557,29 @@ export default function ConnectDB() {
             {connectionType === "sqlite" && (
               <>
                 <div>
-                  <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+                  <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                     Connection Alias
                   </label>
                   <input
                     value={sqliteAlias}
                     onChange={(e) => setSqliteAlias(e.target.value)}
                     placeholder="e.g. my_sqlite_db"
-                    className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-green/50 transition"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+                  <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                     SQLite File Path
                   </label>
                   <input
                     value={sqlitePath}
                     onChange={(e) => setSqlitePath(e.target.value)}
                     placeholder="C:/Users/you/project/db.sqlite3"
-                    className="w-full bg-navy-900 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-neon-green/50 transition font-mono"
+                    className="w-full bg-white border border-slate-200 rounded px-3 py-2.5 text-sm text-flux-on-surface placeholder-slate-400 focus:outline-none focus:border-flux-primary-container focus:ring-2 focus:ring-flux-primary-container/10 transition font-mono"
                   />
-                  <p className="text-slate-500 text-xs mt-1.5">
+                  <p className="text-flux-on-surface-variant text-xs mt-1.5">
                     Enter the full path to your .db file on this PC.
-                    e.g. Django → <span className="text-neon-green font-mono">C:/myproject/db.sqlite3</span>
+                    e.g. Django → <span className="text-flux-secondary font-mono">C:/myproject/db.sqlite3</span>
                   </p>
                 </div>
               </>
@@ -587,7 +587,7 @@ export default function ConnectDB() {
 
             {/* Connection string preview */}
             <div>
-              <label className="text-xs text-slate-400 uppercase tracking-wider font-medium block mb-1.5">
+              <label className="text-xs text-flux-on-surface-variant uppercase tracking-wider font-semibold block mb-1.5">
                 Connection String Preview
               </label>
               <div className="code-block text-xs break-all">{getConnectionString() || "—"}</div>
@@ -595,10 +595,10 @@ export default function ConnectDB() {
 
             {/* Test Connection Results */}
             {testResult && (
-              <div className={`flex items-center gap-2 border rounded-lg px-3 py-2.5 text-sm ${
+              <div className={`flex items-center gap-2 border rounded px-3 py-2.5 text-sm ${
                 testResult.success 
-                  ? "bg-green-950/30 border-green-800/50 text-neon-green" 
-                  : "bg-red-950/30 border-red-800/50 text-red-400"
+                  ? "bg-flux-secondary/10 border-flux-secondary/20 text-flux-secondary" 
+                  : "bg-flux-error/10 border-flux-error/20 text-flux-error"
               }`}>
                 {testResult.success ? <CheckCircle size={16} /> : <AlertTriangle size={16} className="shrink-0" />}
                 <span className="break-all">{testResult.message}</span>
@@ -610,7 +610,7 @@ export default function ConnectDB() {
               <button
                 onClick={handleTestConnection}
                 disabled={testing}
-                className="w-full py-3 bg-neon-purple/10 border border-neon-purple/40 text-neon-purple font-semibold rounded-lg hover:bg-neon-purple/20 transition glow-purple flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 bg-flux-tertiary-container/10 border border-flux-tertiary-container/30 text-flux-tertiary font-semibold rounded hover:bg-flux-tertiary-container/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {testing ? (
                   <><Loader size={16} className="animate-spin" /> Testing...</>
@@ -622,7 +622,7 @@ export default function ConnectDB() {
               <button
                 onClick={handleSave}
                 disabled={testing}
-                className="w-full py-3 bg-neon-green/10 border border-neon-green/40 text-neon-green font-semibold rounded-lg hover:bg-neon-green/20 transition glow-green flex items-center justify-center gap-2"
+                className="w-full py-3 bg-flux-primary text-white font-semibold rounded hover:bg-flux-primary-container transition flex items-center justify-center gap-2"
               >
                 {saved ? (
                   <><CheckCircle size={16} /> Saved!</>
