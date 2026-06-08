@@ -1,0 +1,37 @@
+services:
+  # Backend Web Service (FastAPI)
+  - type: web
+    name: schema-drift-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python seed.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: schema-drift-db
+          property: connectionString
+      - key: OPENROUTER_API_KEY
+        sync: false # User will input their OpenRouter API key in Render dashboard
+      - key: OPENROUTER_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: LLM_MODEL
+        value: openai/gpt-3.5-turbo
+
+  # Frontend Static Site (Vite / React)
+  - type: web
+    name: schema-drift-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    rootDir: frontend
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: schema-drift-backend
+          property: host
+
+databases:
+  - name: schema-drift-db
+    plan: free
