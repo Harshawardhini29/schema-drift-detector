@@ -17,6 +17,7 @@ class SchemaSnapshot(Base):
     db_alias = Column(String, index=True)
     db_type = Column(String)
     snapshot = Column(JSON)
+    user_id = Column(Integer, index=True, nullable=True)
     created_at = Column(DateTime, default=ist_now)
 
 
@@ -30,6 +31,7 @@ class DriftReport(Base):
     raw_diff = Column(JSON)
     llm_analysis = Column(JSON)
     overall_risk = Column(String)
+    user_id = Column(Integer, index=True, nullable=True)
     created_at = Column(DateTime, default=ist_now)
 
 

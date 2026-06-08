@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { testConnection } from "../api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const PG_DEFAULTS = {
   host: "localhost", port: "5432", dbname: "", user: "", password: "", alias: "",
@@ -54,6 +55,9 @@ const parsePostgresUri = (uri, alias) => {
 
 export default function ConnectDB() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const connectionsKey = user ? `db_connections_${user.email}` : "db_connections";
+  const activeConnKey = user ? `db_connection_${user.email}` : "db_connection";
   const [databases, setDatabases] = useState([]);
   const [view, setView] = useState("list"); // "list" | "form"
   const [editingId, setEditingId] = useState(null);
@@ -81,7 +85,7 @@ export default function ConnectDB() {
   };
 
   const loadDatabases = () => {
-    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
     setDatabases(list);
   };
 
@@ -90,7 +94,7 @@ export default function ConnectDB() {
   }, []);
 
   const getActiveDbId = () => {
-    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    const active = JSON.parse(localStorage.getItem(activeConnKey) || "{}");
     if (!active.connection_string) return null;
     const found = databases.find(
       (db) => db.connection_string === active.connection_string && db.db_alias === active.db_alias
@@ -140,29 +144,29 @@ export default function ConnectDB() {
   };
 
   const handleDeleteClick = (id) => {
-    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
     const updated = list.filter((db) => db.id !== id);
-    localStorage.setItem("db_connections", JSON.stringify(updated));
+    localStorage.setItem(connectionsKey, JSON.stringify(updated));
     setDatabases(updated);
 
-    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    const active = JSON.parse(localStorage.getItem(activeConnKey) || "{}");
     const foundDeleted = list.find((db) => db.id === id);
     if (foundDeleted && active.connection_string === foundDeleted.connection_string && active.db_alias === foundDeleted.db_alias) {
       if (updated.length > 0) {
-        localStorage.setItem("db_connection", JSON.stringify({
+        localStorage.setItem(activeConnKey, JSON.stringify({
           connection_string: updated[0].connection_string,
           db_alias: updated[0].db_alias,
           db_type: updated[0].db_type,
           connection_type: updated[0].connection_type,
         }));
       } else {
-        localStorage.removeItem("db_connection");
+        localStorage.removeItem(activeConnKey);
       }
     }
   };
 
   const handleSetActive = (db) => {
-    localStorage.setItem("db_connection", JSON.stringify({
+    localStorage.setItem(activeConnKey, JSON.stringify({
       connection_string: db.connection_string,
       db_alias: db.db_alias,
       db_type: db.db_type,
@@ -210,7 +214,7 @@ export default function ConnectDB() {
       return;
     }
 
-    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
     let updated;
     const dbType = connectionType === "sqlite" ? "sqlite" : "postgresql";
 
@@ -239,13 +243,13 @@ export default function ConnectDB() {
       updated = [...list, newDb];
     }
 
-    localStorage.setItem("db_connections", JSON.stringify(updated));
+    localStorage.setItem(connectionsKey, JSON.stringify(updated));
     setDatabases(updated);
 
-    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    const active = JSON.parse(localStorage.getItem(activeConnKey) || "{}");
     const isEditingActive = editingId && list.find(d => d.id === editingId)?.connection_string === active.connection_string;
     if (!active.connection_string || isEditingActive || !editingId) {
-      localStorage.setItem("db_connection", JSON.stringify({
+      localStorage.setItem(activeConnKey, JSON.stringify({
         connection_string: cs,
         db_alias: alias,
         db_type: dbType,

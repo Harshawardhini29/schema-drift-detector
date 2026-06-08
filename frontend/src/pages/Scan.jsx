@@ -3,12 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { runScan } from "../api";
 import { RiskBadge, ClassBadge } from "../components/Badges";
 import { Zap, AlertTriangle, CheckCircle, Loader } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Scan() {
-  const databases = JSON.parse(localStorage.getItem("db_connections") || "[]");
+  const { user } = useAuth();
+  const connectionsKey = user ? `db_connections_${user.email}` : "db_connections";
+  const activeConnKey = user ? `db_connection_${user.email}` : "db_connection";
+
+  const databases = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
   
   const [selectedDbId, setSelectedDbId] = useState(() => {
-    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    const active = JSON.parse(localStorage.getItem(activeConnKey) || "{}");
     if (active.connection_string) {
       const found = databases.find(
         (db) => db.connection_string === active.connection_string && db.db_alias === active.db_alias
@@ -21,7 +26,7 @@ export default function Scan() {
   });
   
   const [form, setForm] = useState(() => {
-    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
+    const active = JSON.parse(localStorage.getItem(activeConnKey) || "{}");
     if (active.connection_string) {
       const found = databases.find(
         (db) => db.connection_string === active.connection_string && db.db_alias === active.db_alias
@@ -59,10 +64,10 @@ export default function Scan() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const active = JSON.parse(localStorage.getItem("db_connection") || "{}");
-    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    const active = JSON.parse(localStorage.getItem(activeConnKey) || "{}");
+    const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
     if (!active.connection_string && list.length > 0) {
-      localStorage.setItem("db_connection", JSON.stringify({
+      localStorage.setItem(activeConnKey, JSON.stringify({
         connection_string: list[0].connection_string,
         db_alias: list[0].db_alias,
         db_type: list[0].db_type,
@@ -90,7 +95,7 @@ export default function Scan() {
           db_alias: db.db_alias,
           db_type: db.db_type,
         });
-        localStorage.setItem("db_connection", JSON.stringify({
+        localStorage.setItem(activeConnKey, JSON.stringify({
           connection_string: db.connection_string,
           db_alias: db.db_alias,
           db_type: db.db_type,

@@ -24,8 +24,10 @@ def seed_db():
             db.add(john)
             db.add(dev)
             db.commit()
+            john_id = john.id
             print("Users seeded successfully! (John / password)")
         else:
+            john_id = existing_user.id
             print("User 'John' already exists, skipping user seed.")
 
         # 2. Seed Snapshots
@@ -55,6 +57,7 @@ def seed_db():
                 db_alias="college_db",
                 db_type="postgresql",
                 snapshot=snapshot_1_data,
+                user_id=john_id,
                 created_at=datetime.utcnow() - timedelta(days=2)
             )
             db.add(snap1)
@@ -93,6 +96,7 @@ def seed_db():
                 db_alias="college_db",
                 db_type="postgresql",
                 snapshot=snapshot_2_data,
+                user_id=john_id,
                 created_at=datetime.utcnow() - timedelta(days=1)
             )
             db.add(snap2)
@@ -169,6 +173,7 @@ def seed_db():
                 raw_diff=raw_diff,
                 llm_analysis=llm_analysis,
                 overall_risk="high",
+                user_id=john_id,
                 created_at=datetime.utcnow() - timedelta(hours=12)
             )
             db.add(report)

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getSnapshots, getSnapshot } from "../api";
 import { History, ChevronDown, ChevronUp, Database } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 // Per-table accordion item
 function SchemaTable({ tableName, tableData }) {
@@ -47,9 +48,12 @@ function SchemaTable({ tableName, tableData }) {
 }
 
 export default function Snapshots() {
+  const { user } = useAuth();
+  const connectionsKey = user ? `db_connections_${user.email}` : "db_connections";
+
   const [snapshots, setSnapshots] = useState([]);
   const [databases, setDatabases] = useState(() => 
-    JSON.parse(localStorage.getItem("db_connections") || "[]")
+    JSON.parse(localStorage.getItem(connectionsKey) || "[]")
   );
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
@@ -77,7 +81,7 @@ export default function Snapshots() {
   };
 
   const handleToggleAutoTake = (dbId) => {
-    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
     const updated = list.map((db) => {
       if (db.id === dbId) {
         const newValue = !db.auto_take;
@@ -91,14 +95,14 @@ export default function Snapshots() {
       }
       return db;
     });
-    localStorage.setItem("db_connections", JSON.stringify(updated));
+    localStorage.setItem(connectionsKey, JSON.stringify(updated));
     setDatabases(updated);
     // Dispatch local storage event so other components (App.jsx) know it changed
     window.dispatchEvent(new Event("storage"));
   };
 
   const handleChangeInterval = (dbId, interval) => {
-    const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+    const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
     const val = Number(interval);
     const updated = list.map((db) => {
       if (db.id === dbId) {
@@ -110,7 +114,7 @@ export default function Snapshots() {
       }
       return db;
     });
-    localStorage.setItem("db_connections", JSON.stringify(updated));
+    localStorage.setItem(connectionsKey, JSON.stringify(updated));
     setDatabases(updated);
     window.dispatchEvent(new Event("storage"));
   };

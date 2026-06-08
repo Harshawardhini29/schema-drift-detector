@@ -11,13 +11,15 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { runScan } from "./api";
 
 function useAutoScan() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !user) return;
+
+    const connectionsKey = `db_connections_${user.email}`;
 
     const checkAndTriggerScans = async () => {
-      const list = JSON.parse(localStorage.getItem("db_connections") || "[]");
+      const list = JSON.parse(localStorage.getItem(connectionsKey) || "[]");
       let updated = false;
 
       const newConnections = await Promise.all(
@@ -50,7 +52,7 @@ function useAutoScan() {
       );
 
       if (updated) {
-        localStorage.setItem("db_connections", JSON.stringify(newConnections));
+        localStorage.setItem(connectionsKey, JSON.stringify(newConnections));
         window.dispatchEvent(new Event("storage"));
       }
     };

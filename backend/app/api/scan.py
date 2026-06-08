@@ -24,17 +24,17 @@ class TestConnectionRequest(BaseModel):
     connection_string: str
 
 
-def _run_scan_logic(db: Session, db_alias: str, db_type: str, connection_string: str):
+def _run_scan_logic(db: Session, db_alias: str, db_type: str, connection_string: str, user_id: int):
     try:
         current_schema = extract_schema(connection_string)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Connection failed: {str(e)}")
 
-    current_snap = save_snapshot(db, db_alias, db_type, current_schema)
+    current_snap = save_snapshot(db, db_alias, db_type, current_schema, user_id)
 
     previous_snap = (
         db.query(SchemaSnapshot)
-        .filter(SchemaSnapshot.db_alias == db_alias)
+        .filter(SchemaSnapshot.db_alias == db_alias, SchemaSnapshot.user_id == user_id)
         .order_by(SchemaSnapshot.created_at.desc())
         .offset(1)
         .first()
@@ -57,6 +57,7 @@ def _run_scan_logic(db: Session, db_alias: str, db_type: str, connection_string:
         raw_diff=diff,
         llm_analysis=llm_analysis,
         overall_risk=llm_analysis.get("overall_risk", "unknown"),
+        user_id=user_id,
     )
     db.add(report)
     db.commit()
@@ -93,14 +94,14 @@ def test_connection(req: TestConnectionRequest):
         raise HTTPException(status_code=400, detail=f"Connection failed: {str(e)}")
 
 
-@router.post("/scan", dependencies=[Depends(get_current_user)])
-def run_scan(req: ScanRequest, db: Session = Depends(get_db)):
-    return _run_scan_logic(db, req.db_alias, req.db_type, req.connection_string)
+@router.post("/scan")
+def run_scan(req: ScanRequest, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    return _run_scan_logic(db, req.db_alias, req.db_type, req.connection_string, current_user.id)
 
 
-@router.get("/snapshots", dependencies=[Depends(get_current_user)])
-def list_snapshots(db_alias: Optional[str] = None, db: Session = Depends(get_db)):
-    snaps = get_all_snapshots(db, db_alias)
+@router.get("/snapshots")
+def list_snapshots(db_alias: Optional[str] = None, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    snaps = get_all_snapshots(db, current_user.id, db_alias)
     return [
         {
             "id": s.id,
@@ -113,17 +114,17 @@ def list_snapshots(db_alias: Optional[str] = None, db: Session = Depends(get_db)
     ]
 
 
-@router.get("/snapshots/{snapshot_id}", dependencies=[Depends(get_current_user)])
-def get_snapshot(snapshot_id: int, db: Session = Depends(get_db)):
-    snap = db.query(SchemaSnapshot).filter(SchemaSnapshot.id == snapshot_id).first()
+@router.get("/snapshots/{snapshot_id}")
+def get_snapshot(snapshot_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    snap = db.query(SchemaSnapshot).filter(SchemaSnapshot.id == snapshot_id, SchemaSnapshot.user_id == current_user.id).first()
     if not snap:
         raise HTTPException(status_code=404, detail="Snapshot not found")
     return snap
 
 
-@router.get("/drift-reports", dependencies=[Depends(get_current_user)])
-def list_drift_reports(db_alias: Optional[str] = None, db: Session = Depends(get_db)):
-    q = db.query(DriftReport)
+@router.get("/drift-reports")
+def list_drift_reports(db_alias: Optional[str] = None, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    q = db.query(DriftReport).filter(DriftReport.user_id == current_user.id)
     if db_alias:
         q = q.filter(DriftReport.db_alias == db_alias)
     reports = q.order_by(DriftReport.created_at.desc()).all()
@@ -140,25 +141,25 @@ def list_drift_reports(db_alias: Optional[str] = None, db: Session = Depends(get
     ]
 
 
-@router.get("/drift-reports/{report_id}", dependencies=[Depends(get_current_user)])
-def get_drift_report(report_id: int, db: Session = Depends(get_db)):
-    report = db.query(DriftReport).filter(DriftReport.id == report_id).first()
+@router.get("/drift-reports/{report_id}")
+def get_drift_report(report_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    report = db.query(DriftReport).filter(DriftReport.id == report_id, DriftReport.user_id == current_user.id).first()
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     return report
 
 
-@router.get("/dashboard", dependencies=[Depends(get_current_user)])
-def dashboard(db: Session = Depends(get_db)):
-    total_scans = db.query(SchemaSnapshot).count()
-    total_drifts = db.query(DriftReport).count()
+@router.get("/dashboard")
+def dashboard(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    total_scans = db.query(SchemaSnapshot).filter(SchemaSnapshot.user_id == current_user.id).count()
+    total_drifts = db.query(DriftReport).filter(DriftReport.user_id == current_user.id).count()
 
     risk_counts = {"low": 0, "medium": 0, "high": 0, "none": 0}
-    for r in db.query(DriftReport).all():
+    for r in db.query(DriftReport).filter(DriftReport.user_id == current_user.id).all():
         risk = (r.overall_risk or "none").lower()
         risk_counts[risk] = risk_counts.get(risk, 0) + 1
 
-    recent = db.query(DriftReport).order_by(DriftReport.created_at.desc()).limit(5).all()
+    recent = db.query(DriftReport).filter(DriftReport.user_id == current_user.id).order_by(DriftReport.created_at.desc()).limit(5).all()
 
     return {
         "total_scans": total_scans,
