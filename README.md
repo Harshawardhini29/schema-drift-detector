@@ -2,7 +2,7 @@
 
 > An AI-powered full-stack web application that monitors database schema changes, detects structural drift, and uses an **LLM agent** (via OpenRouter) to classify risk, explain downstream impact, and generate mitigation recommendations — all in real time.
 
-🔗 **Live Deployment**: [schema-drift-detector.vercel.app](https://schema-drift-detector.vercel.app/login)  
+🔗 **Live Deployment**: [schema-drift-detector.vercel.app](https://schema-drift-detector-one.vercel.app/login)  
 🎥 **Demo Video**: [Google Drive Link](https://drive.google.com/file/d/1vkb8hT86jioxVOIBoAOw10UJUbtTEG8k/view?usp=drive_link)
 
 ---
